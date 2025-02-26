@@ -1,4 +1,4 @@
-package com.ctu.jobhunter.service.error;
+package com.ctu.jobhunter.Exception.error;
 
 public class IdInvalidException extends RuntimeException {
     public IdInvalidException (String message){
