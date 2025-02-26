@@ -1,4 +1,4 @@
-package com.ctu.jobhunter.service;
+package com.ctu.jobhunter.config;
 
 import java.util.Collections;
 
@@ -8,6 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import com.ctu.jobhunter.repository.UserRepository;
+import com.ctu.jobhunter.service.UserService;
 
 @Component("userDetailService")
 public class UserDetailsCustom implements UserDetailsService {
@@ -20,7 +23,7 @@ public class UserDetailsCustom implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        com.ctu.jobhunter.domain.User user = userService.handleGetUserByEmail(username);
+        com.ctu.jobhunter.domain.User user = userService.handleGetUserByUsername(username);
         return new User(
                 user.getEmail(),
                 user.getPassword(),

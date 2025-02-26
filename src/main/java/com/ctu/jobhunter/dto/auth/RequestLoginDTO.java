@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginDTO {
-    @NotBlank(message = "email không được để trống!")
-    String email;
+public class RequestLoginDTO {
+    // @NotBlank(message = "email không được để trống!")
+    String username;
     @NotBlank(message = "password không được để trống!")
     String password;
 }

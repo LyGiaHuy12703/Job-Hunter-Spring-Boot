@@ -94,4 +94,19 @@ public class UserService {
         return userMapper.toResponseUserDTO(users);
     }
 
+    public User handleGetUserByUsername(String username) {
+        return this.userRepository.findByEmail(username).orElse(null);
+    }
+
+    public void updateUserToken(String token, String email) {
+        User currentUser = handleGetUserByUsername(email);
+        if (currentUser != null) {
+            currentUser.setRefreshToken(token);
+            userRepository.save(currentUser);
+        }
+    }
+
+    public User getUserByEmailAndRefreshToken(String refresh_token, String email) {
+        return userRepository.findByEmailAndRefreshToken(email, refresh_token);
+    }
 }

@@ -41,9 +41,9 @@ public class Company {
     // cach luu Instant nay co the dat may chu o cac nuoc khac van duoc khac voi
     // localdate
     // json format tra ve cho front end con data luy o timezone +0
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     Instant createdAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     Instant updatedAt;
     String createdBy;
     String updatedBy;

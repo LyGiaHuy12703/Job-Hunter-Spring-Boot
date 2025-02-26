@@ -6,6 +6,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -68,7 +69,7 @@ public class SecurityConfig {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("Gia Huy");
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("permission");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
@@ -80,14 +81,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
             CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http.authorizeHttpRequests(
-                auth -> auth.requestMatchers("/api/v1/login", "/").permitAll()
+                auth -> auth.requestMatchers("/auth/login", "/auth/refresh", "/").permitAll()
                         .anyRequest().authenticated() // ngăn tất cả request đi qua
         ).oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())
                 .authenticationEntryPoint(customAuthenticationEntryPoint))
-                // .exceptionHandling(exception -> exception
-                // .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) // 401
-                // .accessDeniedHandler(new BearerTokenAccessDeniedHandler()) // 403
-                // )
                 .csrf(f -> f.disable()) // cơ chế bảo vệ phải chuyển token của java spring
                 .formLogin(f -> f.disable()) // tắt formlogin của spring security
                 .sessionManagement(

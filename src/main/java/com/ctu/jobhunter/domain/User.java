@@ -6,6 +6,7 @@ import com.ctu.jobhunter.utils.SecurityUtil;
 import com.ctu.jobhunter.utils.constant.GenderEnum;
 
 import jakarta.annotation.Generated;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -41,6 +42,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     GenderEnum gender;
     String address;
+    @Column(columnDefinition = "MEDIUMTEXT")
     String refreshToken;
 
     Instant createdAt;

@@ -39,11 +39,11 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 .map(Throwable::getMessage)
                 .orElse(authenticationException.getMessage());
 
-        RestResponse<Object> res = new RestResponse<Object>();
+        RestResponse<Object> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
         res.setError(errorMessage);
         res.setMessage("Token không hợp lệ");
-        
+
         mapper.writeValue(response.getWriter(), res);
     }
 
