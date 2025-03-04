@@ -5,6 +5,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import com.ctu.jobhunter.domain.Company;
 import com.ctu.jobhunter.domain.User;
 import com.ctu.jobhunter.dto.auth.ResponseLoginDTO;
 import com.ctu.jobhunter.dto.users.ResponseUserDTO;
@@ -17,6 +18,8 @@ public interface UserMapper {
     ResponseLoginDTO.UserLogin toUserLoginDTO(User user);
 
     ResponseLoginDTO.UserGetAccount toUserGetAccount(User user);
+
+    ResponseUserDTO.Company toResponseUserCompany(Company company);
 
     ResponseUserDTO toResponseUserDTO(User user);
 

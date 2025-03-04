@@ -1,11 +1,13 @@
 package com.ctu.jobhunter.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import com.ctu.jobhunter.domain.Company;
 import com.ctu.jobhunter.domain.User;
 
 //thêm interface JpaSpecificationExecutor để có thêm thư viện filter
@@ -16,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     boolean existsByEmail(String email);
 
     User findByEmailAndRefreshToken(String email, String refreshToken);
+
+    List<User> findByCompany(Company company);
 }

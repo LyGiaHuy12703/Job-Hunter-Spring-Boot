@@ -1,6 +1,8 @@
 package com.ctu.jobhunter.service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ctu.jobhunter.Exception.error.IdInvalidException;
+import com.ctu.jobhunter.domain.Company;
 import com.ctu.jobhunter.domain.User;
 import com.ctu.jobhunter.dto.pagination.Meta;
 import com.ctu.jobhunter.dto.pagination.ResultPaginationDTO;
@@ -23,8 +26,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final CompanyService companyService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
+    public UserService(CompanyService companyService, UserRepository userRepository, PasswordEncoder passwordEncoder,
+            UserMapper userMapper) {
+        this.companyService = companyService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
@@ -42,26 +48,52 @@ public class UserService {
                 .gender(request.getGender())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
-        userRepository.save(user);
 
         ResponseUserDTO res = userMapper.toResponseUserDTO(user);
+
+        // check company
+        if (request.getCompany() != null) {
+            Company companyOptional = companyService.findById(request.getCompany().getId());
+            if (companyOptional != null) {
+                ResponseUserDTO.Company com = userMapper.toResponseUserCompany(companyOptional);
+                user.setCompany(companyOptional);
+                res.setCompany(com);
+            }
+        }
+        userRepository.save(user);
         return res;
     }
 
     public ResultPaginationDTO fetchAll(Specification<User> spec, Pageable pageable) {
         Page<User> pageUser = userRepository.findAll(spec, pageable);
+
         Meta meta = Meta.builder()
                 .page(pageable.getPageNumber() + 1)
                 .pageSize(pageable.getPageSize())
                 .pages(pageUser.getTotalPages())
                 .total(pageUser.getTotalElements())
                 .build();
-        List<ResponseUserDTO> users = userMapper.toListResponseUserDTO(pageUser.getContent());
-        ResultPaginationDTO rs = ResultPaginationDTO.builder()
+
+        // Ánh xạ User -> ResponseUserDTO đảm bảo đầy đủ dữ liệu
+        List<ResponseUserDTO> users = pageUser.getContent().stream()
+                .map(user -> new ResponseUserDTO(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getName(),
+                        user.getGender(),
+                        user.getAddress(),
+                        user.getAge(),
+                        user.getCreatedAt(),
+                        user.getUpdatedAt(),
+                        user.getCompany() != null
+                                ? new ResponseUserDTO.Company(user.getCompany().getId(), user.getCompany().getName())
+                                : null))
+                .collect(Collectors.toList());
+
+        return ResultPaginationDTO.builder()
                 .meta(meta)
                 .result(users)
                 .build();
-        return rs;
     }
 
     public ResponseUserDTO fetchUserById(String id) {
@@ -69,7 +101,7 @@ public class UserService {
         if (user == null) {
             throw new IdInvalidException("User với id " + id + " không tồn tại");
         }
-        return userMapper.toResponseUserDTO(user);
+        return convertToResponseUserDTO(user);
     }
 
     public void handleDeleteUsers(String id) {
@@ -90,8 +122,14 @@ public class UserService {
         users.setEmail(request.getEmail());
         users.setGender(request.getGender());
         users.setName(request.getName());
+        if (request.getCompany() != null) {
+            if (companyService.findById(request.getCompany().getId()) != null) {
+                users.setCompany(request.getCompany());
+            }
+        }
+
         userRepository.save(users);
-        return userMapper.toResponseUserDTO(users);
+        return convertToResponseUserDTO(users);
     }
 
     public User handleGetUserByUsername(String username) {
@@ -109,4 +147,15 @@ public class UserService {
     public User getUserByEmailAndRefreshToken(String refresh_token, String email) {
         return userRepository.findByEmailAndRefreshToken(email, refresh_token);
     }
+
+    public ResponseUserDTO convertToResponseUserDTO(User user) {
+        ResponseUserDTO res = userMapper.toResponseUserDTO(user);
+
+        if (user.getCompany() != null) {
+            ResponseUserDTO.Company com = userMapper.toResponseUserCompany(user.getCompany());
+            res.setCompany(com);
+        }
+        return res;
+    }
+
 }
